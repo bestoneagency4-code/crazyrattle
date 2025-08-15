@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rev & Guess!</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #ff3e00;
+      text-align: center;
+    }
+
+    .game-container {
+      max-width: 500px;
+      width: 100%;
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 62, 0, 0.5);
+    }
+
+    button {
+      background: #ff3e00;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #ff6622;
+    }
+
+    .option-btn {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+    }
+
+    .score {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .feedback {
+      margin: 10px 0;
+      font-size: 20px;
+      height: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎵 Rev & Guess! 🎵</h1>
+
+  <div class="game-container">
+    <button id="start-btn">Start Game</button>
+    <div id="audio-container" style="display:none;">
+      <audio id="vehicle-sound"></audio>
+      <button id="play-sound-btn">🔊 Play Sound</button>
+      <div id="options-container"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="score" id="score"></div>
+    </div>
+  </div>
+
+  <script>
+    const vehicles = [
+      { name: 'Ferrari', audio: 'https://www.soundjay.com/car/sounds/car-ferrari-01.mp3' },
+      { name: 'Harley', audio: 'https://www.soundjay.com/motorcycle/sounds/harley-davidson-01.mp3' },
+      { name: 'Lamborghini', audio: 'https://www.soundjay.com/car/sounds/lamborghini-01.mp3' },
+      { name: 'Ducati', audio: 'https://www.soundjay.com/motorcycle/sounds/ducati-01.mp3' }
+    ];
+
+    let score = 0;
+    let currentRound = 0;
+    const totalRounds = 5;
+
+    const startBtn = document.getElementById('start-btn');
+    const audioContainer = document.getElementById('audio-container');
+    const vehicleSound = document.getElementById('vehicle-sound');
+    const playSoundBtn = document.getElementById('play-sound-btn');
+    const optionsContainer = document.getElementById('options-container');
+    const feedback = document.getElementById('feedback');
+    const scoreDisplay = document.getElementById('score');
+
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      audioContainer.style.display = 'block';
+      score = 0;
+      currentRound = 0;
+      scoreDisplay.textContent = `Score: ${score}`;
+      nextRound();
+    });
+
+    playSoundBtn.addEventListener('click', () => {
+      vehicleSound.play();
+    });
+
+    function nextRound() {
+      feedback.textContent = '';
+      if (currentRound >= totalRounds) {
+        feedback.textContent = `🎉 Game Over! Your score: ${score}/${totalRounds}`;
+        optionsContainer.innerHTML = '';
+        return;
+      }
+
+      currentRound++;
+      const shuffled = vehicles.sort(() => 0.5 - Math.random());
+      const correct = shuffled[0];
+      vehicleSound.src = correct.audio;
+
+      const options = shuffled.slice(0, 3).sort(() => 0.5 - Math.random());
+      optionsContainer.innerHTML = '';
+
+      options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = option.name;
+        btn.addEventListener('click', () => {
+          if (option.name === correct.name) {
+            feedback.textContent = '✅ Correct!';
+            score++;
+          } else {
+            feedback.textContent = `❌ Wrong! It was ${correct.name}`;
+          }
+          scoreDisplay.textContent = `Score: ${score}`;
+          setTimeout(nextRound, 1500);
+        });
+        optionsContainer.appendChild(btn);
+      });
+
+      vehicleSound.play();
+    }
+  </script>
+
+</body>
+</html>
